@@ -1,14 +1,18 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.jvm.tasks.Jar
 
-val mainClassName = "org.apache.catalina.startup.Tomcat.Main"
-
 buildscript{
-
+    val shadowPluginVer = "2.0.4"
+    dependencies{
+        classpath("com.github.jengelman.gradle.plugins:shadow:$shadowPluginVer")
+    }
 }
 
 plugins {
     java
     application
+    id("org.jetbrains.kotlin.jvm") version "1.2.21"
+    id("com.github.johnrengelman.shadow") version "2.0.4"
 }
 
 group = "com.amlabs.tomcat.embedded"
@@ -19,17 +23,25 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
+tasks.withType<Jar>{
+    manifest {
+        attributes(mapOf(
+                "Main-Class" to "com.amlabs.tomcat.embedded.Main"
+        ))
+    }
+}
+
 repositories {
     mavenCentral()
 }
 
-tasks.register<Jar>("exeJar"){
-    manifest{
-        attributes(Pair("Main-Class", "org.apache.catalina.startup.Tomcat.Main"))
+tasks.withType<ShadowJar> {
+    manifest {
+        attributes(mapOf(
+                "Main-Class" to "com.amlabs.tomcat.embedded.Main"
+        ))
     }
-    baseName = project.name + "-all"
-    from(configurations.compile.map { if(it.isDirectory) it else zipTree(it) })
-    with(tasks["jar"] as CopySpec)
+    mergeServiceFiles()
 }
 
 dependencies {
