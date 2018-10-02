@@ -47,4 +47,8 @@ tasks.withType<ShadowJar> {
 dependencies {
     compile("org.apache.tomcat.embed", "tomcat-embed-jasper", "8.0.47")
     compile("org.springframework", "spring-webmvc", "5.0.9.RELEASE")
+    compile("org.springframework.integration", "spring-integration-core", "5.0.8.RELEASE")
+    compile("org.slf4j","slf4j-api", "1.7.25")
+    compile("ch.qos.logback","logback-classic", "1.2.3")
+    compile("ch.qos.logback","logback-core", "1.2.3")
 }

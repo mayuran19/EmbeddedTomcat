@@ -2,35 +2,19 @@ package com.amlabs.tomcat.embedded;
 
 import org.apache.catalina.startup.Tomcat;
 
-import java.io.File;
-import java.io.IOException;
+import java.util.Optional;
 
 public class Main {
-    private static final int PORT = 8080;
+    public static final Optional<String> port = Optional.ofNullable(System.getenv("PORT"));
 
     public static void main(String args[]) throws Exception{
+        String contextPath = "/";
         String appBase = ".";
         Tomcat tomcat = new Tomcat();
-        tomcat.setBaseDir(createTempDir());
-        tomcat.setPort(PORT);
+        tomcat.setPort(Integer.valueOf(port.orElse("8080") ));
         tomcat.getHost().setAppBase(appBase);
-        tomcat.addWebapp("", appBase);
+        tomcat.addWebapp(contextPath, appBase);
         tomcat.start();
         tomcat.getServer().await();
-    }
-
-    private static String createTempDir() {
-        try {
-            File tempDir = File.createTempFile("tomcat.", "." + PORT);
-            tempDir.delete();
-            tempDir.mkdir();
-            tempDir.deleteOnExit();
-            return tempDir.getAbsolutePath();
-        } catch (IOException ex) {
-            throw new RuntimeException(
-                    "Unable to create tempDir. java.io.tmpdir is set to " + System.getProperty("java.io.tmpdir"),
-                    ex
-            );
-        }
     }
 }
